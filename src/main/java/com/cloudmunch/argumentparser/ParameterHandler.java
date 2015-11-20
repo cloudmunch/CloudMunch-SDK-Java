@@ -1,4 +1,4 @@
-package com.cloudmunch.javasdk.arguments;
+package com.cloudmunch.argumentparser;
 
 public class ParameterHandler {
 
