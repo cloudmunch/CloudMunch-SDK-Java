@@ -12,7 +12,7 @@ We recommend using [Maven](https://maven.apache.org "Maven") as package manager.
 </dependency>
 ```
 Above SDK is in the following repository, so add the following entry under repositories. 
-```
+```xml
 	<!-- Repository to Download Cloudmunch SDK Jar -->
 	<repository>
 		<id>ossrh</id>
@@ -21,7 +21,7 @@ Above SDK is in the following repository, so add the following entry under repos
 ```
 Also, add maven assembly plugin to package plugin along with SDK dependencies. 
 
-```
+```xml
 	<plugin>
 		<artifactId>maven-assembly-plugin</artifactId>
 		<executions>
@@ -132,7 +132,7 @@ Step2: Create a file plugin.json with the following contents,
  
 Step 3:
 Create pom.xml to download Cloudmunch Java  SDK and package the plugin with SDK as follows: 
-```
+```xml
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
