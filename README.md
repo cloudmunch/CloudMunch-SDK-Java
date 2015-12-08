@@ -167,6 +167,13 @@ Create pom.xml to download Cloudmunch Java  SDK and package the plugin with SDK 
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<!-- Repository to Download Cloudmunch SDK Jar -->
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
 </project>
 ``` 
 
