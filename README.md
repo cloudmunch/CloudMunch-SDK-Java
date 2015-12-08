@@ -11,6 +11,34 @@ We recommend using [Maven](https://maven.apache.org "Maven") as package manager.
 	<version>1.0-SNAPSHOT</version>
 </dependency>
 ```
+Above SDK is in the following repository, so add the following entry under repositories. 
+```
+	<!-- Repository to Download Cloudmunch SDK Jar -->
+	<repository>
+		<id>ossrh</id>
+		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	</repository>
+```
+Also, add maven assembly plugin to package plugin along with SDK dependencies. 
+
+```
+	<plugin>
+		<artifactId>maven-assembly-plugin</artifactId>
+		<executions>
+			<execution>
+				<phase>package</phase>
+				<goals>
+				<goal>single</goal>
+				</goals>
+			</execution>
+		</executions>
+		<configuration>
+			<descriptorRefs>
+				<descriptorRef>jar-with-dependencies</descriptorRef>
+			</descriptorRefs>
+		</configuration>
+	</plugin>
+```
 
 ##Cloudmunch SDK Details
 ###PluginAbstract class
@@ -103,14 +131,46 @@ Step2: Create a file plugin.json with the following contents,
  ```
  
 Step 3:
-Add the following dependency details in pom.xml to download Cloudmunch Java  SDK 
+Create pom.xml to download Cloudmunch Java  SDK and package the plugin with SDK as follows: 
 ```
-  <dependency>
-  	<groupId>com.cloudmunch</groupId>
-  	<artifactId>CloudMunch-Java-SDK</artifactId>
-  	<version>1.0-SNAPSHOT</version>
-  </dependency>
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>Cloudmunch</groupId>
+	<artifactId>HelloDisplay</artifactId>
+	<version>0.0.1</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.cloudmunch</groupId>
+			<artifactId>CloudMunch-Java-SDK</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
 ``` 
+
+
 
 Step 4:
 Create a folder 'src/main/java'. and package as com.cloudmunch. 
@@ -195,3 +255,10 @@ PluginLogHandler.logHandler("ERROR", $message);
 PluginLogHandler.logHandler("WARN", $message);
 ```
 
+## Creating Plugin Deliverable
+Run goal `clean package` on this maven project to create deliverables. On successful completion of running the package goal, following deliverables will be created. 
+ - HelloDisplay-0.0.1.jar
+ - HelloDisplay-0.0.1-jar-with-dependencies.jar
+ 
+HelloDisplay-0.0.1-jar-with-dependencies.jar is the main deliverable of your plugin.  
+ 
