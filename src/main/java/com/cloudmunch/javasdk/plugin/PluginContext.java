@@ -14,6 +14,7 @@ public class PluginContext {
     private String archiveLocation;
     private String targetServer;
     private String cloudProviders;
+    private String runNumber;
 
     /**
      * @return the masterUrl
@@ -193,6 +194,20 @@ public class PluginContext {
      */
     public void setPipeline(String pipeline) {
 	this.pipeline = pipeline;
+    }
+
+    /**
+     * @return the runNumber
+     */
+    public String getRunNumber() {
+        return runNumber;
+    }
+
+    /**
+     * @param runNumber the runNumber to set
+     */
+    public void setRunNumber(String runNumber) {
+        this.runNumber = runNumber;
     }
 
 }

@@ -83,6 +83,8 @@ public abstract class PluginAbstract {
 	String domainVariable = "{domain}";
 	String applicationVariable = "{application}";
 	String pipelineVariable = "{pipeline}";
+	String workspace = "{workspace}";
+	String run = "{run}";
 
 	if (variables.has(masterUrl)) {
 	    pc.setMasterUrl(variables.getString(masterUrl));
@@ -95,6 +97,12 @@ public abstract class PluginAbstract {
 	}
 	if (variables.has(pipelineVariable)) {
 	    pc.setPipeline(variables.getString(pipelineVariable));
+	}
+	if (variables.has(workspace)) {
+	    pc.setWorkspace(variables.getString(workspace));
+	}
+	if (variables.has(run)) {
+	    pc.setRunNumber(variables.getString(run));
 	}
     }
 
