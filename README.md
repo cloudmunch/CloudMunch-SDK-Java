@@ -47,7 +47,7 @@ This class, provides methods to read parameters, variables and integrations.
 
 This class has the following lifecycle methods that the plugin need to invoke,
 
-#####initialize() - 
+#####initialize(String[] args) - 
 This method handles the input parameters, variables and integrations  and make these available for plugin.
 
 #####getInputParams() - 
