@@ -44,6 +44,7 @@ Also, add maven assembly plugin to package plugin along with SDK dependencies.
 ###PluginAbstract class
 This is a base abstract class that should be extended by any plugin. 
 This class, provides methods to read parameters, variables and integrations. 
+
 This class has the following lifecycle methods that the plugin need to invoke,
 
 #####initialize() - 
@@ -55,18 +56,23 @@ This method returns the list of inputs to the plugin.
 #####getVariables() - 
 This method returns the list of variables available to the plugin. 
 
-#####getIntegrations() - 
-This method returns the list of integrations to the plugin. 
+#####getIntegrationDetails() - 
+This method returns the details of integration to the plugin. 
 
 #####process() - 
 This is an abstract method to be implemented by every plugin.
 
 #####performAppcompletion() - 
 This method handles the completion of a plugin execution.
+
+#####outputPipelineVariables() - 
+Plugin uses this method to output the variables to pipeline to use in the following steps/plugins.
  
 ####Here is  the list of helper methods that can be used by plugin,
-#####getPc()
+#####getPluginContext()
 This method returns PluginContext object for this runtime.
+
+
 
 
 ###PluginContext class
@@ -200,27 +206,32 @@ public class HelloDisplayClass extends PluginAbstract {
 
     @Override
     public void process() {
-	PluginLogHandler.logHandler(LogModes.INFO.toString(),
+    PluginLogHandler pluginLogger = getLogHandler();
+	pluginLogger.logHandler(LogModes.INFO.toString(),
 		"Inside Plugin Process "
 		);
-	PluginLogHandler.logHandler(LogModes.DEBUG.toString(),
+	pluginLogger.logHandler(LogModes.DEBUG.toString(),
 		"Recieved Parameters as " + getInputParams());
-	PluginLogHandler.logHandler(LogModes.DEBUG.toString(),
+	pluginLogger.logHandler(LogModes.DEBUG.toString(),
 		"Recieved Variables as " + getVariables());
-	PluginLogHandler.logHandler(LogModes.DEBUG.toString(),
-		"Recieved Integrations as " + getIntegrations());
+	pluginLogger.logHandler(LogModes.DEBUG.toString(),
+		"Recieved Integrations as " + getIntegrationDetails());
 		
 	//Getting environment related information from Plugin Context 
 	String masterUrl = this.pc.getMasterUrl();
-	PluginLogHandler.logHandler(LogModes.INFO.toString(),
+	pluginLogger.logHandler(LogModes.INFO.toString(),
 		"URL is , " + masterUrl);
+		
+	JSONObject integrations = getIntegrationDetails();
+	String url = integrations.getString("jenkins_url");
+	pluginLogger.logHandler(LogModes.INFO.toString(), url);
     }
-  
-  //Getting input parameters   
-  String name = getInputParams().getString("name");
+     
+     //Getting input parameters   
+    String name = getInputParams().getString("name");
 	PluginLogHandler.logHandler(LogModes.INFO.toString(),
 		"HELLO, " + name);
-
+  
 }
 
 ```
@@ -235,9 +246,8 @@ This integration will now be available for the plugin at runtime. The details ca
  ```
   @Override
   public void process() {
-      JSONObject integrations = getIntegrations();
-      String accessKey = integrations.getString("accesskey");
-      String processKey = integrations.getString("processkey");
+      JSONObject integrations = getIntegrationDetails();
+      String jenkinsUrl = integrations.getString("jenkins_url");
   }
 ```
 
@@ -249,8 +259,9 @@ DEBUG, INFO, WARN and ERROR.
 Here is the sample code to output log messages,
 
 ```
-PluginLogHandler.logHandler("INFO", “Info message”);
-PluginLogHandler.logHandler("DEBUG", “Debug message”);
+PluginLogHandler pluginLogger = getLogHandler();
+pluginLogger.logHandler("INFO", “Info message”);
+pluginLogger.logHandler("DEBUG", “Debug message”);
 ```
 
 ##Handling failure or warning scenarios
@@ -258,8 +269,9 @@ PluginLogHandler.logHandler("DEBUG", “Debug message”);
  
 ```
 $message = "Error message”;
-PluginLogHandler.logHandler("ERROR", $message);
-PluginLogHandler.logHandler("WARN", $message);
+PluginLogHandler pluginLogger = getLogHandler();
+pluginLogger.logHandler("ERROR", $message);
+pluginLogger.logHandler("WARN", $message);
 ```
 
 ## Creating Plugin Deliverable

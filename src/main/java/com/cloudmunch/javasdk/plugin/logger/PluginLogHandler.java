@@ -4,13 +4,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.cloudmunch.javasdk.plugin.PluginContext;
+
 public class PluginLogHandler {
+
+    private static PluginContext pluginContext = null;
+
+    public PluginLogHandler(PluginContext pc) {
+	pluginContext = pc;
+    }
 
     public enum LogModes {
 	DEBUG, INFO, ERROR, WARN;
     }
 
-    public static boolean validLogLevel(String logLevel) {
+    public boolean validLogLevel(String logLevel) {
 
 	for (LogModes c : LogModes.values()) {
 	    if (c.name().equals(logLevel)) {
@@ -20,7 +28,7 @@ public class PluginLogHandler {
 	return false;
     }
 
-    public static void logHandler(String loglevel, String message) {
+    public void logHandler(String loglevel, String message) {
 	SimpleDateFormat dateFormat = new SimpleDateFormat(
 		"yyyy-MM-dd HH:mm:ss");
 	dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -30,7 +38,10 @@ public class PluginLogHandler {
 	LogModes logMode = LogModes.valueOf(loglevel);
 
 	String logLevelWithDate = "[" + loglevel + "]" + " ["
-		+ currentTime + "] ";
+		+ currentTime + "]";
+	if (null != pluginContext && null != pluginContext.getStepName()) {
+	    logLevelWithDate += " [" + pluginContext.getStepName() + "]";
+	}
 
 	if (null == logMode) {
 	    System.err.println(logLevelWithDate + "Unknow logging mode "
@@ -63,7 +74,7 @@ public class PluginLogHandler {
 	return false;
     }
 
-    public static void dummyerrorHandler() {
+    public void dummyerrorHandler() {
 
     }
 }

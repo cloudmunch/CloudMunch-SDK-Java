@@ -10,7 +10,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,7 +26,8 @@ public class ArgumentParser {
 
     public final static List<ParameterHandler> requiredParams = new ArrayList<ParameterHandler>();
 
-    public static int parseArguments(String[] args) {
+    public static int parseArguments(String[] args,
+	    PluginLogHandler pluginLogHandler) {
 	Options options = new Options();
 
 	Option jsonInputOption = new Option("i", "jsoninput", true,
@@ -86,7 +86,7 @@ public class ArgumentParser {
 		}
 
 		if (unAvailableParamsList.size() > 0) {
-		    PluginLogHandler.logHandler(LogModes.ERROR.toString(),
+		    pluginLogHandler.logHandler(LogModes.ERROR.toString(),
 			    "Parameters that are missing - "
 				    + unAvailableParamsList);
 		    return unAvailableParamsList.size();
@@ -104,21 +104,21 @@ public class ArgumentParser {
 	    @SuppressWarnings("unchecked")
 	    List<String> missedOptions = e.getMissingOptions();
 	    for (int i = 0; i < missedOptions.size(); i++) {
-		PluginLogHandler.logHandler(LogModes.ERROR.toString(),
+		pluginLogHandler.logHandler(LogModes.ERROR.toString(),
 			options.getOption(missedOptions.get(i)).toString());
 		message.append(
 			"Missing Option : "
 				+ options.getOption(missedOptions.get(i)))
 			.append("\r\n");
 	    }
-	    writeReport();
+	    writeReport(pluginLogHandler);
 	    // System.exit(1);
 	} catch (ParseException e) {
-	    PluginLogHandler.logHandler(LogModes.ERROR.toString(),
+	    pluginLogHandler.logHandler(LogModes.ERROR.toString(),
 		    e.getMessage());
 	    message.append(e.getMessage()).append("\r\n");
 	} catch (JSONException e) {
-	    PluginLogHandler.logHandler(LogModes.ERROR.toString(),
+	    pluginLogHandler.logHandler(LogModes.ERROR.toString(),
 		    e.getMessage());
 	    message.append(e.getMessage()).append("\r\n");
 	}
@@ -133,8 +133,8 @@ public class ArgumentParser {
 	return inputParams.has(key);
     }
 
-    public static void writeReport() {
-	PluginLogHandler.logHandler(LogModes.ERROR.toString(),
+    public static void writeReport(PluginLogHandler pluginLogHandler) {
+	pluginLogHandler.logHandler(LogModes.ERROR.toString(),
 		message.toString());
     }
 

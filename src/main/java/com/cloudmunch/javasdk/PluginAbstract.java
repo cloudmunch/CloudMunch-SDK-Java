@@ -1,11 +1,15 @@
 package com.cloudmunch.javasdk;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 import com.cloudmunch.argumentparser.ArgumentParser;
+import com.cloudmunch.javasdk.plugin.IntegrationHelper;
 import com.cloudmunch.javasdk.plugin.PluginContext;
 import com.cloudmunch.javasdk.plugin.logger.PluginLogHandler;
 import com.cloudmunch.javasdk.plugin.logger.PluginLogHandler.LogModes;
@@ -23,7 +27,9 @@ public abstract class PluginAbstract {
     private JSONObject inputParams = new JSONObject();
     private JSONObject variables = new JSONObject();
     private JSONObject integrations = new JSONObject();
+    private JSONObject integrationDetails = new JSONObject();
     public PluginContext pc = null;
+    public PluginLogHandler pluginLog = null;
     public Date startdate = null;
     public Date endDate = null;
 
@@ -39,10 +45,12 @@ public abstract class PluginAbstract {
      *            the args
      */
     public void initialize(String[] args) {
-	PluginLogHandler.logHandler(LogModes.INFO.toString(),
-		"App execution started");
+	pc = new PluginContext();
+	createLogHandler();
+	// pluginLog.logHandler(LogModes.INFO.toString(),
+	// "App execution started");
 	startdate = new Date(System.currentTimeMillis());
-	processInputs(args);
+	getInputs(args);
     }
 
     /**
@@ -52,33 +60,32 @@ public abstract class PluginAbstract {
      * @param args
      *            the args
      */
-    private void processInputs(String[] args) {
+    private void getInputs(String[] args) {
 
-	ArgumentParser.parseArguments(args);
+	ArgumentParser.parseArguments(args, pluginLog);
 	inputParams = ArgumentParser.inputParams;
 	variables = ArgumentParser.variables;
 	integrations = ArgumentParser.integrations;
-	PluginLogHandler.logHandler(LogModes.DEBUG.toString(),
+	pluginLog.logHandler(LogModes.DEBUG.toString(),
 		"Parameters are " + inputParams);
-	PluginLogHandler.logHandler(LogModes.DEBUG.toString(),
+	pluginLog.logHandler(LogModes.DEBUG.toString(),
 		"Integrations are " + integrations);
-	PluginLogHandler.logHandler(LogModes.DEBUG.toString(),
+	pluginLog.logHandler(LogModes.DEBUG.toString(),
 		"Variables are " + variables);
 
 	if (inputParams.length() == 0) {
-	    PluginLogHandler.logHandler(LogModes.WARN.toString(),
+	    pluginLog.logHandler(LogModes.WARN.toString(),
 		    "Input parameters for this execution are empty");
 	}
 	if (variables.length() == 0) {
-	    PluginLogHandler.logHandler(LogModes.WARN.toString(),
+	    pluginLog.logHandler(LogModes.WARN.toString(),
 		    "Variables for this execution are empty");
 	}
 	if (integrations.length() == 0) {
-	    PluginLogHandler.logHandler(LogModes.WARN.toString(),
+	    pluginLog.logHandler(LogModes.WARN.toString(),
 		    "Integrations for this execution are empty");
 	}
 
-	pc = new PluginContext();
 	String masterUrl = "{master_url}";
 	String domainVariable = "{domain}";
 	String applicationVariable = "{application}";
@@ -104,6 +111,41 @@ public abstract class PluginAbstract {
 	if (variables.has(run)) {
 	    pc.setRunNumber(variables.getString(run));
 	}
+	String stepDetailsKey = "stepdetails";
+	if (variables.has(stepDetailsKey)) {
+
+	    JSONObject stepDetails = new JSONObject();
+	    if (variables.get(stepDetailsKey) instanceof JSONObject) {
+		stepDetails = variables.getJSONObject(stepDetailsKey);
+	    } else if (variables.get(stepDetailsKey) instanceof String) {
+		stepDetails = new JSONObject(
+			variables.getString(stepDetailsKey));
+	    }
+	    if (stepDetails.length() > 0) {
+		pc.setStepID(stepDetails.getString("id"));
+		pc.setStepName(stepDetails.getString("name"));
+		pc.setStepReportsLocation(stepDetails
+			.getString("reports_location"));
+	    }
+	}
+	createLogHandler();
+	integrationDetails = new IntegrationHelper(getLogHandler())
+		.getIntegration(getInputParams(),
+			integrations);
+
+    }
+
+    private void createLogHandler() {
+	pluginLog = new PluginLogHandler(getPluginContext());
+    }
+
+    /**
+     * Gets the log handler.
+     *
+     * @return the log handler
+     */
+    public PluginLogHandler getLogHandler() {
+	return pluginLog;
     }
 
     /**
@@ -111,7 +153,7 @@ public abstract class PluginAbstract {
      * capture some data.
      */
     public void performAppcompletion() {
-	PluginLogHandler.logHandler(LogModes.INFO.toString(),
+	pluginLog.logHandler(LogModes.INFO.toString(),
 		"App completed successfully");
 	endDate = new Date(System.currentTimeMillis());
 	long timedifference = endDate.getTime() - startdate.getTime();
@@ -132,7 +174,7 @@ public abstract class PluginAbstract {
 		millisecondsTominutes
 			- hoursToMinutes,
 		millisecondsToSeconds - hoursToSeconds);
-	PluginLogHandler.logHandler(LogModes.INFO.toString(),
+	pluginLog.logHandler(LogModes.INFO.toString(),
 		"Total time taken: " + diff);
     }
 
@@ -167,9 +209,9 @@ public abstract class PluginAbstract {
     }
 
     /**
-     * @return the pc
+     * @return the plugin context
      */
-    public PluginContext getPc() {
+    public PluginContext getPluginContext() {
 	return pc;
     }
 
@@ -182,17 +224,44 @@ public abstract class PluginAbstract {
     }
 
     /**
-     * @return the integrations
+     * Returns the details of the integration for the provider select for plugin
+     * 
+     * @return the integrationDetails
      */
-    public JSONObject getIntegrations() {
-	return integrations;
+    public JSONObject getIntegrationDetails() {
+	return integrationDetails;
     }
 
     /**
-     * @param integrations
-     *            the integrations to set
+     * Outputs the pipeline variables.
+     *
+     * @param variableName
+     *            the variable name
+     * @param variableValue
+     *            the variable value
      */
-    public void setIntegrations(JSONObject integrations) {
-	this.integrations = integrations;
+    public void outputPipelineVariables(String variableName,
+	    String variableValue) {
+
+	File variablesFileLoc = new File(pc.getStepReportsLocation(),
+		pc.getStepID() + ".out");
+	JSONObject variables = new JSONObject();
+	try {
+	    if (variablesFileLoc.exists()) {
+		String contents;
+		contents = FileUtils.readFileToString(variablesFileLoc);
+		if (contents.trim().length() > 0) {
+		    variables = new JSONObject(contents);
+		}
+	    }
+
+	    variables.put(variableName, variableValue);
+	    FileUtils.writeStringToFile(variablesFileLoc, variables.toString());
+	} catch (IOException e) {
+	    pluginLog
+		    .logHandler("ERROR",
+			    "Exception occurred while pipeline variables are being output ");
+	    e.printStackTrace();
+	}
     }
 }
