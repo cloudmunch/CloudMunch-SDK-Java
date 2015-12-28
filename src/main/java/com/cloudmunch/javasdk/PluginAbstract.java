@@ -255,7 +255,7 @@ public abstract class PluginAbstract {
 		}
 	    }
 
-	    variables.put(variableName, variableValue);
+	    variables.put("{" + variableName + "}", variableValue);
 	    FileUtils.writeStringToFile(variablesFileLoc, variables.toString());
 	} catch (IOException e) {
 	    pluginLog
@@ -264,4 +264,5 @@ public abstract class PluginAbstract {
 	    e.printStackTrace();
 	}
     }
+
 }

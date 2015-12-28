@@ -65,8 +65,12 @@ This is an abstract method to be implemented by every plugin.
 #####performAppcompletion() - 
 This method handles the completion of a plugin execution.
 
-#####outputPipelineVariables() - 
-Plugin uses this method to output the variables to pipeline to use in the following steps/plugins.
+#####outputPipelineVariables(variablename, variablevalue) - 
+Plugin uses this method to output the variables to pipeline to use in the following steps/plugins. Syntax to use that variable in further steps/plugins is `{variablename}`. 
+
+Ex: `outputPipelineVariables(“commit_comment”, “Fixed issue with logging”);`
+
+Usage of this variable in pipeline is `{commit_comment}`
  
 ####Here is  the list of helper methods that can be used by plugin,
 #####getPluginContext()
