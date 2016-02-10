@@ -19,25 +19,95 @@ Above SDK is in the following repository, so add the following entry under repos
 		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 	</repository>
 ```
-Also, add maven assembly plugin to package plugin along with SDK dependencies. 
+Under build section, Set the maven project output directory to "temp" instead of "target" as later will be used for CM Plugin Structure
 
 ```xml
-	<plugin>
-		<artifactId>maven-assembly-plugin</artifactId>
-		<executions>
-			<execution>
-				<phase>package</phase>
-				<goals>
-				<goal>single</goal>
-				</goals>
-			</execution>
-		</executions>
-		<configuration>
-			<descriptorRefs>
-				<descriptorRef>jar-with-dependencies</descriptorRef>
-			</descriptorRefs>
-		</configuration>
-	</plugin>
+	<directory>temp</directory>
+```
+
+Also add, 
+- Maven Clean Plugin to clear the previous data of "temp" and "target" folders
+- Maven assembly plugin to package plugin along with SDK dependencies. 
+- Maven Resources plugin to copy plugin outputs to "temp" directory
+
+
+```xml
+	<plugins>
+		<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>target</directory>
+						</fileset>
+						<fileset>
+							<directory>temp</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-resources1</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/${artifactId}/bin</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/temp</directory>
+									<includes>
+										<include>*.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-plugin-json</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/${artifactId}/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<includes>
+										<include>plugin.json</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
 ```
 
 ##Cloudmunch SDK Details
@@ -100,7 +170,7 @@ Plugin name : Hello
 Input: helloname: This need to be printed out with Hello.
  
 Step1: Create a Maven Project "Hello"
-Step2: Create a file plugin.json with the following contents,
+Step2: Create a file plugin.json with the following contents, "id" should be always same as Maven Artifact ID
 
 ```
 {
@@ -141,7 +211,7 @@ Step2: Create a file plugin.json with the following contents,
  ```
  
 Step 3:
-Create pom.xml to download Cloudmunch Java  SDK and package the plugin with SDK as follows: 
+Create pom.xml for the plugin with the artifactId as "id" given in plugin.json. Refer the following sample pom.xml 
 ```xml
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -158,7 +228,64 @@ Create pom.xml to download Cloudmunch Java  SDK and package the plugin with SDK 
 		</dependency>
 	</dependencies>
 	<build>
+		<directory>temp</directory>
 		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>target</directory>
+						</fileset>
+						<fileset>
+							<directory>temp</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-resources1</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/${artifactId}/bin</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/temp</directory>
+									<includes>
+										<include>*.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-plugin-json</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/${artifactId}/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<includes>
+										<include>plugin.json</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
@@ -175,7 +302,6 @@ Create pom.xml to download Cloudmunch Java  SDK and package the plugin with SDK 
 					</descriptorRefs>
 				</configuration>
 			</plugin>
-		</plugins>
 	</build>
 	<repositories>
 		<!-- Repository to Download Cloudmunch SDK Jar -->
@@ -280,8 +406,11 @@ pluginLogger.logHandler("WARN", $message);
 
 ## Creating Plugin Deliverable
 Run goal `clean package` on this maven project to create deliverables. On successful completion of running the package goal, following deliverables will be created. 
- - HelloDisplay-0.0.1.jar
- - HelloDisplay-0.0.1-jar-with-dependencies.jar
- 
-HelloDisplay-0.0.1-jar-with-dependencies.jar is the main deliverable of your plugin.  
+ - target
+ 	- bin 
+		 - HelloDisplay-0.0.1.jar
+		 - HelloDisplay-0.0.1-jar-with-dependencies.jar
+- 	plugin.json
+		 
+HelloDisplay-0.0.1-jar-with-dependencies.jar is the one with dependencies, and this target folder will be your Plugin Deliverable.  
  
