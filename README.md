@@ -58,7 +58,7 @@ Also add,
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/${artifactId}/bin</outputDirectory>
+							<outputDirectory>${basedir}/../target/${artifactId}/bin</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/temp</directory>
@@ -76,7 +76,7 @@ Also add,
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/${artifactId}/</outputDirectory>
+							<outputDirectory>${basedir}/../target/${artifactId}/</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}</directory>
@@ -255,7 +255,7 @@ Create pom.xml for the plugin with the artifactId as "id" given in plugin.json. 
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/${artifactId}/bin</outputDirectory>
+							<outputDirectory>$${basedir}/../target/${artifactId}/bin</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/temp</directory>
@@ -273,7 +273,7 @@ Create pom.xml for the plugin with the artifactId as "id" given in plugin.json. 
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/${artifactId}/</outputDirectory>
+							<outputDirectory>${basedir}/../target/${artifactId}/</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}</directory>
