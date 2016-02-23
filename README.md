@@ -19,33 +19,14 @@ Above SDK is in the following repository, so add the following entry under repos
 		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 	</repository>
 ```
-Under build section, Set the maven project output directory to "temp" instead of "target" as later will be used for CM Plugin Structure
-
-```xml
-	<directory>temp</directory>
-```
 
 Also add, 
-- Maven Clean Plugin to clear the previous data of "temp" and "target" folders
 - Maven assembly plugin to package plugin along with SDK dependencies. 
-- Maven Resources plugin to copy plugin outputs to "temp" directory
+- Maven Copy Resources plugin to copy plugin outputs to "target" directory
 
 
 ```xml
 	<plugins>
-		<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>target</directory>
-						</fileset>
-						<fileset>
-							<directory>temp</directory>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -61,7 +42,7 @@ Also add,
 							<outputDirectory>${basedir}/../target/${artifactId}/bin</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/temp</directory>
+									<directory>${basedir}/target</directory>
 									<includes>
 										<include>*.jar</include>
 									</includes>
@@ -228,21 +209,7 @@ Create pom.xml for the plugin with the artifactId as "id" given in plugin.json. 
 		</dependency>
 	</dependencies>
 	<build>
-		<directory>temp</directory>
 		<plugins>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>target</directory>
-						</fileset>
-						<fileset>
-							<directory>temp</directory>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -258,7 +225,7 @@ Create pom.xml for the plugin with the artifactId as "id" given in plugin.json. 
 							<outputDirectory>$${basedir}/../target/${artifactId}/bin</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/temp</directory>
+									<directory>${basedir}/target</directory>
 									<includes>
 										<include>*.jar</include>
 									</includes>
