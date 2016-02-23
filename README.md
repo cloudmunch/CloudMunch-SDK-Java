@@ -34,7 +34,7 @@ Also add,
 				<executions>
 					<execution>
 						<id>copy-resources1</id>
-						<phase>package</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -74,7 +74,7 @@ Also add,
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -217,7 +217,7 @@ Create pom.xml for the plugin with the artifactId as "id" given in plugin.json. 
 				<executions>
 					<execution>
 						<id>copy-resources1</id>
-						<phase>package</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
