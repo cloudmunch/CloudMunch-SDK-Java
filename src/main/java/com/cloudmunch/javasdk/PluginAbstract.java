@@ -91,6 +91,7 @@ public abstract class PluginAbstract {
 	String applicationVariable = "{application}";
 	String pipelineVariable = "{pipeline}";
 	String workspace = "{workspace}";
+	String apiKey = "{api_key}";
 	String run = "{run}";
 
 	if (variables.has(masterUrl)) {
@@ -110,6 +111,9 @@ public abstract class PluginAbstract {
 	}
 	if (variables.has(run)) {
 	    pc.setRunNumber(variables.getString(run));
+	}
+	if (variables.has(apiKey)) {
+	    pc.setApiKey(variables.getString(apiKey));
 	}
 	String stepDetailsKey = "stepdetails";
 	if (variables.has(stepDetailsKey)) {
@@ -263,6 +267,17 @@ public abstract class PluginAbstract {
 			    "Exception occurred while pipeline variables are being output ");
 	    e.printStackTrace();
 	}
+    }
+
+    /**
+     * This method gives reference to ServerHelper,this helper class has all the
+     * methods to get/set data on servers registered with cloudmunch.
+     * 
+     * @return ServerHelper serverhelper
+     */
+    public ServerHelper getCloudmunchServerHelper() {
+	ServerHelper serverhelper = new ServerHelper(pc, pluginLog);
+	return serverhelper;
     }
 
 }

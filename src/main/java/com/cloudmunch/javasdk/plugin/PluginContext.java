@@ -15,6 +15,7 @@ public class PluginContext {
     private String targetServer;
     private String cloudProviders;
     private String runNumber;
+    private String apiKey;
 
     /**
      * @return the masterUrl
@@ -200,14 +201,30 @@ public class PluginContext {
      * @return the runNumber
      */
     public String getRunNumber() {
-        return runNumber;
+	return runNumber;
     }
 
     /**
-     * @param runNumber the runNumber to set
+     * @param runNumber
+     *            the runNumber to set
      */
     public void setRunNumber(String runNumber) {
-        this.runNumber = runNumber;
+	this.runNumber = runNumber;
+    }
+
+    /**
+     * @return the apiKey
+     */
+    public String getApiKey() {
+	return apiKey;
+    }
+
+    /**
+     * @param apiKey
+     *            the apiKey to set
+     */
+    public void setApiKey(String apiKey) {
+	this.apiKey = apiKey;
     }
 
 }

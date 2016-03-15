@@ -35,6 +35,8 @@ public class PluginLogHandler {
 	String currentTime = dateFormat.format(new Date(System
 		.currentTimeMillis()));
 
+	loglevel = loglevel.toUpperCase();
+
 	LogModes logMode = LogModes.valueOf(loglevel);
 
 	String logLevelWithDate = "[" + loglevel + "]" + " ["
