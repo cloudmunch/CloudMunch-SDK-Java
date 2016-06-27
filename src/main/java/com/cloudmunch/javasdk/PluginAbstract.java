@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 import com.cloudmunch.argumentparser.ArgumentParser;
+import com.cloudmunch.javasdk.plugin.CloudmunchService;
 import com.cloudmunch.javasdk.plugin.IntegrationHelper;
 import com.cloudmunch.javasdk.plugin.PluginContext;
 import com.cloudmunch.javasdk.plugin.logger.PluginLogHandler;
@@ -32,6 +33,7 @@ public abstract class PluginAbstract {
     public PluginLogHandler pluginLog = null;
     public Date startdate = null;
     public Date endDate = null;
+    private CloudmunchService cloudmunchService = null;
 
     /**
      * This is an abstract method to be implemented by every plugin.
@@ -133,9 +135,16 @@ public abstract class PluginAbstract {
 	    }
 	}
 	createLogHandler();
+
 	integrationDetails = new IntegrationHelper(getLogHandler())
-		.getIntegration(getInputParams(),
-			integrations);
+		.getIntegration(this.getCloudmunchService(), getInputParams());
+
+	pluginLog.logHandler(LogModes.DEBUG.toString(),
+		"Integration Details are " + integrationDetails);
+
+	// integrationDetails = new IntegrationHelper(getLogHandler())
+	// .getIntegration(getInputParams(),
+	// integrations);
 
     }
 
@@ -278,6 +287,15 @@ public abstract class PluginAbstract {
     public ServerHelper getCloudmunchServerHelper() {
 	ServerHelper serverhelper = new ServerHelper(pc, pluginLog);
 	return serverhelper;
+    }
+
+    public CloudmunchService getCloudmunchService() {
+	if (null == this.cloudmunchService) {
+	    this.cloudmunchService = new CloudmunchService(this.pc,
+		    this.pluginLog);
+	}
+
+	return this.cloudmunchService;
     }
 
 }

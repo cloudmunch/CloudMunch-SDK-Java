@@ -20,7 +20,6 @@ public class IntegrationHelper {
 	if (parameters.has(providernameArgName)) {
 	    providerName = parameters.getString(providernameArgName);
 	}
-
 	pluginLogger.logHandler("DEBUG", "Provider Name: " + providerName);
 
 	if (null != providerName && providerName.trim()
@@ -30,10 +29,37 @@ public class IntegrationHelper {
 		    providerName).getJSONObject(confKey);
 	    return providerDetails;
 	}
+	return null;
+    }
+    
+    
+    public JSONObject getIntegration(CloudmunchService cmService, JSONObject parameters){
+	String providernameArgName = "providername";
+	String providerName = null;
 
+	if (parameters.has(providernameArgName)) {
+	    providerName = parameters.getString(providernameArgName);
+	}
+	pluginLogger.logHandler("DEBUG", "Provider Name: " + providerName);
+	
+	if (null != providerName && providerName.trim()
+		.length() > 0) {
+	    
+	    JSONObject contextObj = new JSONObject();
+	    contextObj.put("integrations", providerName);
+	    JSONObject integrations = cmService.getCustomContextData(contextObj, null);
+	    String confKey = "configuration";
+	    
+	    if(integrations.has(confKey)){
+		JSONObject providerDetails = integrations.getJSONObject(confKey);
+		return providerDetails;
+	    }
+	    
+	}
 	return null;
 
-    }
+       }
+       
 
     public JSONObject getService(JSONObject parameters) {
 
@@ -63,4 +89,5 @@ public class IntegrationHelper {
 
 	return null;
     }
+
 }
